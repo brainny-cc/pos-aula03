@@ -4,30 +4,26 @@ import ModalCreateBook from '../components/ModalCreateBook';
 
 const dataSource = [
     {
-        "id": "1",
-        "title": "Teste",
-        "ISBN": 2193821,
-        "publicationDate": "2019-05-05",
-        "genre": "ADVENTURE",
-        "writerName": "Miguel",
-    },
-    {
-        "id": "2",
-        "title": "Teste",
-        "ISBN": 2193821,
-        "publicationDate": "2019-05-05",
-        "genre": "ADVENTURE",
-        "writerName": "Miguel",
-
-    },
-    {
-        "id": "3",
-        "title": "Livro Teste",
-        "ISBN": 13412312,
-        "publicationDate": "2019-05-05",
-        "genre": null,
-        "writerName": "Miguel",
-
+        id: "1",
+        title: "Teste",
+        ISBN: 2193821,
+        publicationDate: "2019-05-05",
+        genre: "ADVENTURE",
+        writerName: "Miguel",
+    }, {
+        id: "2",
+        title: "Teste",
+        ISBN: 2193821,
+        publicationDate: "2019-05-05",
+        genre: "ADVENTURE",
+        writerName: "Miguel",
+    }, {
+        id: "3",
+        title: "Livro Teste",
+        ISBN: 13412312,
+        publicationDate: "2019-05-05",
+        genre: null,
+        writerName: "Miguel",
     }
 ]
 

@@ -1,11 +1,11 @@
 import React from 'react'
 import { Form, Icon, Input, Button } from 'antd';
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import './Register.scss'
 function Register({ form: { getFieldDecorator } }) {
-
+    const history = useHistory()
     function handleSubmit() {
-
+        history.push('/books')
     }
 
     return (

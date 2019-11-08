@@ -1,11 +1,12 @@
 import React from 'react'
 import { Form, Icon, Input, Button } from 'antd';
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import './Login.scss'
 function Login({ form: { getFieldDecorator } }) {
+    const history = useHistory()
 
     function handleSubmit() {
-
+        history.push('/books')
     }
 
     return (
@@ -36,7 +37,7 @@ function Login({ form: { getFieldDecorator } }) {
                     <div className="justify-between">
                         <Button type="primary" htmlType="submit" className="login-form-button">
                             Log in
-                    </Button>
+                        </Button>
                         Or
                     <Link to="/register">register now!</Link>
                     </div>
