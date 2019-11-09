@@ -1,17 +1,49 @@
 import React, { useState } from 'react'
-import { Modal, Form, Input, Icon, Select } from 'antd';
+import { Modal, Form, Input, Icon, Select, notification } from 'antd';
+import { useMutation } from 'react-apollo';
+import gql from 'graphql-tag';
 
-function ModalCreateBook({ active, setActive, form: { getFieldDecorator, validateFields } }) {
-    const [loading, setLoading] = useState(false)
+function ModalCreateBook({ active, setActive, form: { getFieldDecorator, validateFields, resetFields } }) {
+
+    const [mutate, { loading }] = useMutation(gql`
+        mutation createBook($data: CreateBookInput!) {
+            createBook(data: $data) {
+                id
+                title
+                ISBN
+                publicationDate
+                genre 
+                writer {
+                    id
+                    firstname
+                }
+            }
+        }
+    `)
 
     function onModalSubmit() {
-        validateFields((err, values) => {
+        validateFields(async (err, values) => {
             if (!err) {
-                setLoading(true)
-                setTimeout(() => {
-                    setLoading(false)
+                const user = JSON.parse(localStorage.getItem('user'))
+
+                const { data, errors } = await mutate({
+                    variables: {
+                        data: {
+                            ...values,
+                            ISBN: +values.ISBN,
+                            writer: {
+                                id: +user.id
+                            }
+                        }
+                    }
+                })
+                if (!errors) {
+                    notification.success({
+                        message: `Livro ${data.createBook.title} cadastrado`
+                    })
                     setActive(false)
-                }, 1000)
+                    resetFields()
+                }
             }
 
         })
