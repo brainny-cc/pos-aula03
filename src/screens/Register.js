@@ -1,11 +1,48 @@
 import React from 'react'
-import { Form, Icon, Input, Button } from 'antd';
+import { Form, Icon, Input, Button, notification } from 'antd';
 import { Link, useHistory } from 'react-router-dom'
 import './Register.scss'
-function Register({ form: { getFieldDecorator } }) {
+import { useMutation } from 'react-apollo';
+import gql from 'graphql-tag';
+function Register({ form: { getFieldDecorator, validateFields } }) {
     const history = useHistory()
-    function handleSubmit() {
-        history.push('/books')
+
+    const [mutate, { loading }] = useMutation(gql`
+        mutation createWriter($data: CreateWriterInput!) {
+            createWriter(data: $data) {
+                id
+                firstname
+                lastname
+                initials
+                birthday
+                gender
+                phone
+                email
+                role
+            }
+        }
+    `)
+
+    function handleSubmit(e) {
+        e.preventDefault()
+
+        validateFields(async (err, values) => {
+            if (!err) {
+                const { data, errors } = await mutate({
+                    variables: {
+                        data: { ...values, role: "WRITER" }
+                    }
+                })
+
+                if (!errors) {
+                    notification.success({
+                        message: 'Cadastrado com sucesso'
+                    })
+                    history.push('/login')
+                }
+            }
+        })
+
     }
 
     return (
@@ -56,7 +93,7 @@ function Register({ form: { getFieldDecorator } }) {
                 <Form.Item>
 
                     <div className="justify-between">
-                        <Button type="primary" htmlType="submit">
+                        <Button loading={loading} type="primary" htmlType="submit">
                             Register
                         </Button>
                         Or
