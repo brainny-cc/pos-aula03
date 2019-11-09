@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Table, Button } from 'antd';
 import ModalCreateBook from '../components/ModalCreateBook';
-import { useQuery } from 'react-apollo';
+import { useQuery, useSubscription } from 'react-apollo';
 import gql from 'graphql-tag';
 
 // const dataSource = [
@@ -60,7 +60,7 @@ const columns = [
 export default function Books() {
     const [active, setActive] = useState(false)
 
-    const { data, loading } = useQuery(gql`
+    const { data, loading, refetch, updateQuery } = useQuery(gql`
         query allBooks {
             allBooks {
                 id
@@ -75,6 +75,41 @@ export default function Books() {
             }
         } 
     `)
+
+    useSubscription(gql`
+        subscription {
+            onCreatedBook {
+                id
+                title
+                ISBN
+                publicationDate
+                genre
+                writer {
+                    id
+                    firstname
+                }
+            }
+        }
+    `, {
+            onSubscriptionData({ subscriptionData }) {
+                updateQuery((prev) => {
+                    if (!subscriptionData.data) {
+                        return prev
+                    }
+
+                    return Object.assign({}, prev, {
+                        allBooks: [
+                            ...prev.allBooks,
+                            subscriptionData.data.onCreatedBook
+                        ]
+                    })
+                })
+            }
+        })
+
+    useEffect(() => {
+        refetch()
+    }, [active, refetch])
 
 
     return (
