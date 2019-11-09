@@ -2,23 +2,72 @@ import React from 'react'
 import { Form, Icon, Input, Button } from 'antd';
 import { Link, useHistory } from 'react-router-dom'
 import './Login.scss'
-function Login({ form: { getFieldDecorator } }) {
+import { useMutation } from 'react-apollo';
+import gql from 'graphql-tag';
+function Login({ form: { getFieldDecorator, validateFields, setFields } }) {
     const history = useHistory()
 
-    function handleSubmit() {
-        history.push('/books')
+    const [mutate] = useMutation(gql`
+        mutation signin($email: String! $password: String!) {
+            signin(email: $email password: $password) {
+                token
+                writer {
+                    id
+                    firstname
+                    lastname
+                    initials
+                    email
+                }
+            }
+        }
+    `)
+
+    function handleSubmit(e) {
+        e.preventDefault()
+
+        validateFields(async (err, values) => {
+            if (!err) {
+                const { data } = await mutate({
+                    variables: {
+                        email: values.email,
+                        password: values.password
+                    }
+                })
+                if (!data.signin) {
+                    setFields({
+                        email: {
+                            value: values.email,
+                            errors: [new Error('')]
+                        },
+                        password: {
+                            value: values.password,
+                            errors: [new Error('E-mail ou senha inválida')]
+                        },
+                    })
+                    return
+                }
+
+                if (data.signin.token) {
+                    localStorage.setItem('token', data.signin.token)
+                    localStorage.setItem('user', JSON.stringify(data.signin.writer))
+                    history.push('/books')
+                    return
+                }
+            }
+        })
+
     }
 
     return (
         <div className="login-wrapper">
             <Form onSubmit={handleSubmit}>
                 <Form.Item>
-                    {getFieldDecorator('username', {
-                        rules: [{ required: true, message: 'Please input your username!' }],
+                    {getFieldDecorator('email', {
+                        rules: [{ required: true, message: 'Please input your email!' }],
                     })(
                         <Input
                             prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                            placeholder="Username"
+                            placeholder="E-mail"
                         />,
                     )}
                 </Form.Item>
